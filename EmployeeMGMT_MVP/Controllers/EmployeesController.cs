@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -127,6 +128,57 @@ namespace EmployeeMGMT_MVP.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        [HttpPost]
+        public ActionResult Index(HttpPostedFileBase postedFile)
+        {
+            if (postedFile != null)
+            {
+                try
+                {
+                    string fileExtension = Path.GetExtension(postedFile.FileName);
+
+                    //Validate uploaded file and return error.
+                    if (fileExtension != ".csv")
+                    {
+                        ViewBag.Message = "Please select the csv file with .csv extension";
+                        return View();
+                    }
+
+
+                    var employees = new List<Employee>();
+                    using (var sreader = new StreamReader(postedFile.InputStream))
+                    {
+                        //First line is header. If header is not passed in csv then we can neglect the below line.
+                        string[] headers = sreader.ReadLine().Split(',');
+                        //Loop through the records
+                        while (!sreader.EndOfStream)
+                        {
+                            string[] rows = sreader.ReadLine().Split(',');
+
+                            employees.Add(new Employee
+                            {
+                                Id = rows[0].ToString(),
+                                Login = rows[1].ToString(),
+                                Name = rows[2].ToString(),
+                                Salary = decimal.Parse(rows[3].ToString())
+                            });
+                        }
+                    }
+
+                    return View("Index", employees);
+                }
+                catch (Exception ex)
+                {
+                    ViewBag.Message = ex.Message;
+                }
+            }
+            else
+            {
+                ViewBag.Message = "Please select the file first to upload.";
+            }
+            return View();
         }
     }
 }
