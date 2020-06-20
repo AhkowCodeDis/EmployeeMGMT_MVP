@@ -21,7 +21,7 @@ namespace EmployeeMGMT_MVP.Controllers
         }
 
         // GET: Employees/Details/5
-        public ActionResult Details(int? id)
+        public ActionResult Details(string id)
         {
             if (id == null)
             {
@@ -48,6 +48,11 @@ namespace EmployeeMGMT_MVP.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "Id,Login,Name,Salary")] Employee employee)
         {
+            Employee employeeStaging = db.Employees.Find(employee.Id);
+            if (employeeStaging != null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest , "An Existing Employee is Present");
+            }
             if (ModelState.IsValid)
             {
                 db.Employees.Add(employee);
@@ -59,7 +64,7 @@ namespace EmployeeMGMT_MVP.Controllers
         }
 
         // GET: Employees/Edit/5
-        public ActionResult Edit(int? id)
+        public ActionResult Edit(string id)
         {
             if (id == null)
             {
@@ -90,7 +95,7 @@ namespace EmployeeMGMT_MVP.Controllers
         }
 
         // GET: Employees/Delete/5
-        public ActionResult Delete(int? id)
+        public ActionResult Delete(string id)
         {
             if (id == null)
             {
@@ -107,7 +112,7 @@ namespace EmployeeMGMT_MVP.Controllers
         // POST: Employees/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult DeleteConfirmed(string id)
         {
             Employee employee = db.Employees.Find(id);
             db.Employees.Remove(employee);
