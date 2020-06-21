@@ -18,5 +18,11 @@ namespace EmployeeMGMT_MVP.Models
         public string Login { get; set; }
         public string Name { get; set; }
         public Nullable<decimal> Salary { get; set; }
+
+        public string getStrInfo()
+        {
+            return ("Employee ID :" + this.Id + " Login : " + this.Login + " Name : " + this.Name + " Salary : " + this.Salary.ToString()); 
+        }
     }
+    
 }
