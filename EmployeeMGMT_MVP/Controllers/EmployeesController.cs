@@ -16,10 +16,36 @@ namespace EmployeeMGMT_MVP.Controllers
         private Entities db = new Entities();
 
         // GET: Employees
-        public ActionResult Index()
+        public ActionResult Index(string sortOrder)
         {
-            return View(db.Employees.ToList());
+            var employees = from e in db.Employees
+                            select e;
+            ViewBag.IdSortParam = String.IsNullOrEmpty(sortOrder) ? "id_desc" : "";
+            ViewBag.NameSortParam = sortOrder == "name" ? "name_desc" : "name";
+            ViewBag.LoginSortParam = sortOrder == "login" ? "login_desc" : "login";
+            ViewBag.SalarySortParam = sortOrder == "salary" ? "salary_desc" : "salary";
+
+            switch(sortOrder)
+            {
+                case "id_desc":
+                    employees = employees.OrderByDescending(e => e.Id);
+                    break;
+                case "name_desc":
+                    employees = employees.OrderByDescending(e => e.Name);
+                    break;
+                case "login_desc":
+                    employees = employees.OrderByDescending(e => e.Login);
+                    break;
+                case "salary_desc":
+                    employees = employees.OrderByDescending(e => e.Salary);
+                    break;   
+            }
+
+            
+            return View(employees.ToList().Take(30));
         }
+
+
 
         // GET: Employees/Details/5
         public ActionResult Details(string id)
