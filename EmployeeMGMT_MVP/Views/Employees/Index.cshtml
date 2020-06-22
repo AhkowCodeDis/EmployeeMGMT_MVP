@@ -1,5 +1,7 @@
-﻿@model IEnumerable<EmployeeMGMT_MVP.Models.Employee>
-
+﻿
+@model PagedList.IPagedList<EmployeeMGMT_MVP.Models.Employee>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 @{
     ViewBag.Title = "Index";
 }
@@ -9,19 +11,27 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
+
+@using (Html.BeginForm())
+{
+    <p>
+        Find by Id:@Html.TextBox("SearchString")
+        <input type="submit" value="Search" />
+    </p>
+}
 <table class="table">
     <tr>
         <th>
-            @Html.ActionLink("ID", "Index", new { sortOrder = ViewBag.IdSortParam })
+            @Html.ActionLink("ID", "Index", new { sortOrder = ViewBag.IdSortParam, currentFilter = ViewBag.CurrentFilter })
         </th>
         <th>
-            @Html.ActionLink("Login", "Index", new { sortOrder = ViewBag.LoginSortParam })
+            @Html.ActionLink("Login", "Index", new { sortOrder = ViewBag.LoginSortParam, currentFilter = ViewBag.CurrentFilter })
         </th>
         <th>
-            @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.NameSortParam })
+            @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.NameSortParam, currentFilter = ViewBag.CurrentFilter })
         </th>
         <th>
-            @Html.ActionLink("Salary", "Index", new { sortOrder = ViewBag.SalarySortParam })
+            @Html.ActionLink("Salary", "Index", new { sortOrder = ViewBag.SalarySortParam, currentFilter = ViewBag.CurrentFilter })
         </th>
         <th></th>
     </tr>
@@ -50,3 +60,8 @@
     }
 
 </table>
+<br />
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("Index",
+    new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))

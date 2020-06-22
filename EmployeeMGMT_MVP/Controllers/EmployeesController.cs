@@ -8,6 +8,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using EmployeeMGMT_MVP.Models;
+using PagedList;
 
 namespace EmployeeMGMT_MVP.Controllers
 {
@@ -16,16 +17,37 @@ namespace EmployeeMGMT_MVP.Controllers
         private Entities db = new Entities();
 
         // GET: Employees
-        public ActionResult Index(string sortOrder)
+        public ActionResult Index(string sortOrder , string searchString , string currentFilter,  int? page)
         {
-            var employees = from e in db.Employees
-                            select e;
+           
+            ViewBag.CurrentSort = sortOrder;
             ViewBag.IdSortParam = String.IsNullOrEmpty(sortOrder) ? "id_desc" : "";
             ViewBag.NameSortParam = sortOrder == "name" ? "name_desc" : "name";
             ViewBag.LoginSortParam = sortOrder == "login" ? "login_desc" : "login";
             ViewBag.SalarySortParam = sortOrder == "salary" ? "salary_desc" : "salary";
 
-            switch(sortOrder)
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+
+            var employees = from e in db.Employees
+                            select e;
+            employees = employees.OrderBy(e => e.Id);
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                employees = employees.Where(e => e.Id.Contains(searchString));
+                                 
+            }
+
+            switch (sortOrder)
             {
                 case "id_desc":
                     employees = employees.OrderByDescending(e => e.Id);
@@ -41,8 +63,12 @@ namespace EmployeeMGMT_MVP.Controllers
                     break;   
             }
 
+
+            int pageSize = 30;
+            int pageNumber = (page ?? 1);
+            return View(employees.ToPagedList(pageNumber, pageSize));
+
             
-            return View(employees.ToList().Take(30));
         }
 
 
