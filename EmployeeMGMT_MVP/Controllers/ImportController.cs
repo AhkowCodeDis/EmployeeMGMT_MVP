@@ -47,7 +47,7 @@ namespace EmployeeMGMT_MVP.Controllers
                     var employees = new List<Employee>();
                     using (var sreader = new StreamReader(postedFile.InputStream))
                     {
-                        //Loop through the records
+                        //Loop through the records and adding records into list
                         while (!sreader.EndOfStream)
                         {
                             string[] rows = sreader.ReadLine().Split(',');
@@ -61,7 +61,9 @@ namespace EmployeeMGMT_MVP.Controllers
                             });
                         }
                     }
+                    //Validating list of employees
                     validateStr = validateCsv(employees);
+                    //If there are no validation issues , it will do insertion / update
                     if (!(validateStr.Length > 0 ))
                     {
                         statusStr = insertFromCsv(employees);
@@ -71,6 +73,7 @@ namespace EmployeeMGMT_MVP.Controllers
                     {
                         validateStr = "UPLOAD FAILED :" + "<\br>" + validateStr;
                     }
+
                     ViewBag.Output = statusStr;
                     ViewBag.Message = validateStr;
                     //return View("View", employees);
@@ -111,7 +114,8 @@ namespace EmployeeMGMT_MVP.Controllers
             foreach (var employee in employees)
             {
                 Employee employeeStaging = db.Employees.Find(employee.Id);
-
+                
+                // if there are no records in DB and the line is not commented with a '#' , it will create or update record
                 if (employeeStaging == null && !(employee.Id.StartsWith("#")))
                 {
                     //Creating Employee
@@ -130,6 +134,7 @@ namespace EmployeeMGMT_MVP.Controllers
         }
         public string validate( Employee employee)
         {
+            //Validation if there are empty fields and return which row will are having issues with .getStrInfo function
             if ((employee.Id.Length == 0) || (employee.Login.Length == 0) || (employee.Name.Length == 0) || (employee.Salary.HasValue == false))
             {
                 return ("Invalid Row | " + employee.getStrInfo() + "<br/>");
@@ -139,6 +144,7 @@ namespace EmployeeMGMT_MVP.Controllers
                 return "";        
             }
         }
+        //method to validate the list and return information of bad records
         public string validateCsv(List<Employee> employees)
         {
 

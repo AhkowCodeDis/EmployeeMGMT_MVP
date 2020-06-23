@@ -19,7 +19,7 @@ namespace EmployeeMGMT_MVP.Controllers
         // GET: Employees
         public ActionResult Index(string sortOrder , string searchString , string currentFilter,  int? page , string minSalary , string maxSalary)
         {
-
+            //Filter Options
             int minSalaryFilter = 0;
             int maxSalaryFilter = 0;
             ViewBag.CurrentSort = sortOrder;
@@ -27,7 +27,10 @@ namespace EmployeeMGMT_MVP.Controllers
             ViewBag.NameSortParam = sortOrder == "name" ? "name_desc" : "name";
             ViewBag.LoginSortParam = sortOrder == "login" ? "login_desc" : "login";
             ViewBag.SalarySortParam = sortOrder == "salary" ? "salary_desc" : "salary";
-
+            ViewBag.CurrentFilter = searchString;
+            ViewBag.MinSalaryFilter = minSalary;
+            ViewBag.MaxSalaryFilter = maxSalary;
+            //If SearchString is null or empty , will view at page one
             if (searchString != null)
             {
                 page = 1;
@@ -37,19 +40,19 @@ namespace EmployeeMGMT_MVP.Controllers
                 searchString = currentFilter;
             }
 
-            ViewBag.CurrentFilter = searchString;
-            ViewBag.MinSalaryFilter = minSalary;
-            ViewBag.MaxSalaryFilter = maxSalary;
+            //Default Sorting is by id 
             var employees = from e in db.Employees
                             select e;
             employees = employees.OrderBy(e => e.Id);
 
+            //If there is a search string input , will find data that is from search string
             if (!String.IsNullOrEmpty(searchString))
             {
                 employees = employees.Where(e => e.Id.Contains(searchString));
                                  
             }
 
+            //Filtering list that has more than min salary 
             if (!String.IsNullOrEmpty(minSalary))
             {
                 minSalaryFilter = int.Parse(minSalary);
@@ -57,12 +60,14 @@ namespace EmployeeMGMT_MVP.Controllers
 
             }
 
+            //Filtering list that has less than min salary 
             if (!String.IsNullOrEmpty(maxSalary))
             {
                 maxSalaryFilter = int.Parse(maxSalary);
                 employees = employees.Where(e => e.Salary <= maxSalaryFilter);
             }
 
+            //If user click on the header it will order based on what the user click
             switch (sortOrder)
             {
                 case "id_desc":
@@ -79,7 +84,7 @@ namespace EmployeeMGMT_MVP.Controllers
                     break;   
             }
 
-
+            //Each Page holds 30 records
             int pageSize = 30;
             int pageNumber = (page ?? 1);
             return View(employees.ToPagedList(pageNumber, pageSize));
