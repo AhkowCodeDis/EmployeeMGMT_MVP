@@ -17,9 +17,11 @@ namespace EmployeeMGMT_MVP.Controllers
         private Entities db = new Entities();
 
         // GET: Employees
-        public ActionResult Index(string sortOrder , string searchString , string currentFilter,  int? page)
+        public ActionResult Index(string sortOrder , string searchString , string currentFilter,  int? page , string minSalary , string maxSalary)
         {
-           
+
+            int minSalaryFilter = 0;
+            int maxSalaryFilter = 0;
             ViewBag.CurrentSort = sortOrder;
             ViewBag.IdSortParam = String.IsNullOrEmpty(sortOrder) ? "id_desc" : "";
             ViewBag.NameSortParam = sortOrder == "name" ? "name_desc" : "name";
@@ -36,7 +38,8 @@ namespace EmployeeMGMT_MVP.Controllers
             }
 
             ViewBag.CurrentFilter = searchString;
-
+            ViewBag.MinSalaryFilter = minSalary;
+            ViewBag.MaxSalaryFilter = maxSalary;
             var employees = from e in db.Employees
                             select e;
             employees = employees.OrderBy(e => e.Id);
@@ -45,6 +48,19 @@ namespace EmployeeMGMT_MVP.Controllers
             {
                 employees = employees.Where(e => e.Id.Contains(searchString));
                                  
+            }
+
+            if (!String.IsNullOrEmpty(minSalary))
+            {
+                minSalaryFilter = int.Parse(minSalary);
+                employees = employees.Where(e => e.Salary >= minSalaryFilter) ;
+
+            }
+
+            if (!String.IsNullOrEmpty(maxSalary))
+            {
+                maxSalaryFilter = int.Parse(maxSalary);
+                employees = employees.Where(e => e.Salary <= maxSalaryFilter);
             }
 
             switch (sortOrder)

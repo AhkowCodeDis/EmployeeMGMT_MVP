@@ -6,7 +6,7 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Index</h2>
+<h2>Employee DashBoard</h2>
 
 <p>
     @Html.ActionLink("Create New", "Create")
@@ -14,10 +14,14 @@
 
 @using (Html.BeginForm())
 {
-    <p>
-        Find by Id:@Html.TextBox("SearchString")
-        <input type="submit" value="Search" />
-    </p>
+<p>
+    Find by Id: @Html.TextBox("SearchString")
+    <label for="minSalary">Min Salary: </label>
+    <input type="number" id="minSalary" name="minSalary">
+    <label for="maxSalary">Max Salary: </label>
+    <input type="number" id="maxSalary" name="maxSalary">
+    <input type="submit" value="Search" />
+</p>
 }
 <table class="table">
     <tr>
